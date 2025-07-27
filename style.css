@@ -1,9 +1,9 @@
-/* General Styling & Mobile First */
 :root {
     --bg-color: #fafafa;
     --link-bg-color: #ffffff;
     --text-color: #1c1c1c;
     --shadow-color: rgba(0,0,0,0.1);
+    --bg-image: none;
 }
 
 body {
@@ -13,15 +13,20 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    padding-top: 2rem;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    min-height: 100vh;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     transition: background-color 0.3s, color 0.3s;
 }
 
 .container, .admin-container {
     width: 100%;
     max-width: 680px;
-    padding: 0 1rem;
-    box-sizing: border-box;
 }
 
 /* Profile Section */
@@ -29,19 +34,24 @@ body {
     text-align: center;
     margin-bottom: 2rem;
 }
-
 #profile-pic {
     width: 96px;
     height: 96px;
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 4px 12px var(--shadow-color);
+    border: 3px solid var(--link-bg-color);
 }
-
 #display-name {
     font-size: 1.25rem;
     font-weight: 600;
     margin-top: 1rem;
+    background-color: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    display: inline-block;
 }
 
 /* Links Section */
@@ -52,167 +62,102 @@ body {
 }
 
 .link-item, .dropdown-toggle {
-    display: block;
-    background-color: var(--link-bg-color);
-    color: var(--text-color);
     text-decoration: none;
-    padding: 1rem;
     text-align: center;
     border-radius: 8px;
     font-weight: 500;
     box-shadow: 0 2px 8px var(--shadow-color);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 12px 15px;
+    background-color: var(--link-bg-color);
+    color: var(--text-color);
 }
-
-.link-item:hover {
+.link-item:hover, .dropdown-toggle:hover {
     transform: scale(1.02);
     box-shadow: 0 4px 12px var(--shadow-color);
 }
+.link-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.link-item span, .dropdown-toggle span {
+    flex-grow: 1;
+    text-align: center;
+}
+.link-item:has(.link-icon) span, .dropdown-toggle:has(.link-icon) span {
+    margin-left: -59px;
+    padding-left: 59px;
+}
+.link-item:not(:has(.link-icon)), .dropdown-toggle:not(:has(.link-icon)) {
+    justify-content: center;
+}
 
-.dropdown-container .dropdown-toggle {
+.dropdown-container .dropdown-toggle.open {
     border-radius: 8px 8px 0 0;
 }
-
 .sublinks-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    list-style: none; padding: 0; margin: 0;
     background-color: var(--link-bg-color);
     border-radius: 0 0 8px 8px;
-    overflow: hidden;
-    max-height: 0;
+    overflow: hidden; max-height: 0;
     transition: max-height 0.5s ease-in-out;
 }
-
 .sublinks-list.open {
-    max-height: 500px; /* Adjust as needed */
+    max-height: 500px;
     padding-bottom: 0.5rem;
+    box-shadow: 0 2px 8px var(--shadow-color);
 }
-
 .sublink-item {
-    display: block;
-    color: var(--text-color);
-    text-decoration: none;
-    padding: 0.75rem 1rem;
+    display: block; color: var(--text-color);
+    text-decoration: none; padding: 0.75rem 1rem;
     transition: background-color 0.2s;
 }
 .sublink-item:hover {
     background-color: rgba(0,0,0,0.05);
 }
 
-
-/* Admin & Login Page */
-.login-form, .admin-section {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    margin-bottom: 1.5rem;
-}
-
-h2, h3 {
-    margin-top: 0;
-}
-
-input[type="text"], input[type="url"], input[type="email"], input[type="password"] {
-    width: 100%;
-    padding: 0.8rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-button {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-.save-button {
-    background-color: #28a745;
-}
-.save-button:hover {
-    background-color: #218838;
-}
-
-#logout-btn {
-    width: auto;
-    padding: 0.5rem 1rem;
-    background-color: #dc3545;
-}
-#logout-btn:hover {
-    background-color: #c82333;
-}
-
-.error-message {
-    color: #dc3545;
-    font-size: 0.9rem;
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
+/* Admin Styles */
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.admin-section { background-color: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
+input[type="text"], input[type="url"], input[type="email"], input[type="password"] { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+button { padding: 1rem; border: none; background-color: #007bff; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
+button:hover { background-color: #0056b3; }
+.save-button { width: 100%; background-color: #28a745; margin-top: 1rem; }
+.save-button:hover { background-color: #218838; }
+#logout-btn { width: auto; padding: 0.5rem 1rem; background-color: #dc3545; }
+#logout-btn:hover { background-color: #c82333; }
 
 .admin-link-entry {
-    border: 1px solid #eee;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 8px;
+    border: 1px solid #eee; padding: 1rem; margin-bottom: 1rem; border-radius: 8px;
+    display: flex; align-items: flex-start; gap: 10px;
+    background-color: #fdfdfd;
 }
-
-.color-picker {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 0.5rem;
+.drag-handle {
+    width: 24px; height: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18L15 12L9 6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center;
+    transform: rotate(90deg);
+    cursor: grab; flex-shrink: 0; margin-top: 10px; opacity: 0.5;
 }
+.admin-link-entry:hover .drag-handle { opacity: 1; }
+.sortable-ghost { background-color: #e6f7ff; }
 
-/* Tambahkan ini di paling bawah style.css */
-
-.link-item, .dropdown-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 15px;
-    padding: 12px 15px;
+.link-inputs { flex-grow: 1; }
+.dropdown-label { display: block; margin-top: 0.5rem; font-size: 0.9em; }
+.delete-link-btn {
+    background: none; border: none; color: #cc2a36; font-size: 1.7rem;
+    padding: 0; width: 30px; height: 30px; cursor: pointer; line-height: 1;
+    flex-shrink: 0; align-self: center;
 }
-
-.link-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    object-fit: cover;
-    /* Menjaga gambar agar tidak mengecil */
-    flex-shrink: 0;
+.sublinks-editor { padding-top: 1rem; border-top: 1px dashed #ccc; margin-top: 1rem; width: 100%; }
+.sublink-entry { display: flex; gap: 5px; align-items: center; margin-bottom: 5px; }
+.delete-sublink-btn {
+    background: none; border: none; color: #aaa; padding: 5px; cursor: pointer;
 }
-
-.link-item span, .dropdown-toggle span {
-    flex-grow: 1;
-    text-align: center;
-}
-
-/* Memberi margin agar teks tetap di tengah jika ada ikon */
-.link-item:has(.link-icon) span, .dropdown-toggle:has(.link-icon) span {
-    margin-left: -59px; /* -(lebar ikon + gap) */
-    padding-left: 59px;
-}
-
-/* Jika tidak ada ikon, pastikan teks benar-benar di tengah */
-.link-item:not(:has(.link-icon)), .dropdown-toggle:not(:has(.link-icon)) {
-    justify-content: center;
-}
-
