@@ -7,12 +7,15 @@ const USER_ID = "main_profile";
 const isLoginPage = window.location.pathname.includes('login.html');
 const isAdminPage = window.location.pathname.includes('admin.html');
 
-// Inisialisasi SortableJS
 if (isAdminPage) {
-    const adminLinksList = document.getElementById('admin-links-list');
-    new Sortable(adminLinksList, {
-        animation: 150,
-        handle: '.drag-handle', // Tentukan elemen untuk di-drag
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminLinksList = document.getElementById('admin-links-list');
+        if (typeof Sortable !== 'undefined') {
+            new Sortable(adminLinksList, {
+                animation: 150,
+                handle: '.drag-handle',
+            });
+        }
     });
 }
 
@@ -90,13 +93,13 @@ function createLinkEditor(linkData = {}) {
                 <input type="checkbox" class="is-dropdown-checkbox" ${isDropdown ? 'checked' : ''}>
                 Jadikan Dropdown?
             </label>
+            <div class="sublinks-editor" ${!isDropdown ? 'style="display:none;"' : ''}>
+                <h5>Sub-links:</h5>
+                <div class="sublinks-list-editor"></div>
+                <button type="button" class="add-sublink-btn">+ Tambah Sub-link</button>
+            </div>
         </div>
         <button type="button" class="delete-link-btn" title="Hapus link ini">×</button>
-        <div class="sublinks-editor" ${!isDropdown ? 'style="display:none;"' : ''}>
-            <h5>Sub-links:</h5>
-            <div class="sublinks-list-editor"></div>
-            <button type="button" class="add-sublink-btn">+ Tambah Sub-link</button>
-        </div>
     `;
 
     list.appendChild(entry);
@@ -110,7 +113,12 @@ function createLinkEditor(linkData = {}) {
         sublinksEditor.style.display = checkbox.checked ? 'block' : 'none';
     });
     
-    entry.querySelector('.delete-link-btn').addEventListener('click', () => entry.remove());
+    entry.querySelector('.delete-link-btn').addEventListener('click', () => {
+        if(confirm('Anda yakin ingin menghapus link ini?')) {
+            entry.remove();
+        }
+    });
+    
     entry.querySelector('.add-sublink-btn').addEventListener('click', () => createSublinkEditor(entry.querySelector('.sublinks-list-editor')));
     
     if (isDropdown && linkData.sublinks) {
@@ -119,21 +127,29 @@ function createLinkEditor(linkData = {}) {
 }
 
 function createSublinkEditor(container, sublinkData = {}) {
-    // ... (fungsi ini tidak berubah)
+    const subEntry = document.createElement('div');
+    subEntry.className = 'sublink-entry';
+    subEntry.innerHTML = `
+        <input type="text" class="sublink-title" placeholder="Judul Sub-link" value="${sublinkData.title || ''}">
+        <input type="url" class="sublink-url" placeholder="URL Sub-link" value="${sublinkData.url || ''}">
+        <button type="button" class="delete-sublink-btn">×</button>
+    `;
+    container.appendChild(subEntry);
+    subEntry.querySelector('.delete-sublink-btn').addEventListener('click', () => subEntry.remove());
 }
 
 async function saveAdminData() {
     const links = [];
     document.querySelectorAll('#admin-links-list .admin-link-entry').forEach(entry => {
         const title = entry.querySelector('.link-title').value;
-        if (!title) return; // Abaikan link jika judulnya kosong
+        if (!title) return;
 
         const imageUrl = entry.querySelector('.link-image-url').value;
         const isDropdown = entry.querySelector('.is-dropdown-checkbox').checked;
 
         if (isDropdown) {
             const sublinks = [];
-            entry.querySelectorAll('.sublinks-list-editor > div').forEach(subEntry => {
+            entry.querySelectorAll('.sublinks-list-editor .sublink-entry').forEach(subEntry => {
                 const subTitle = subEntry.querySelector('.sublink-title').value;
                 const subUrl = subEntry.querySelector('.sublink-url').value;
                 if(subTitle && subUrl) sublinks.push({ title: subTitle, url: subUrl });
