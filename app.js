@@ -100,14 +100,19 @@ async function loadProfile() {
                     }
                 });
             }
+            
+            // Tampilkan container setelah semua elemen di atas selesai dibuat
+            document.querySelector('.container').classList.add('loaded');
+
         } else {
             displayNameEl.textContent = 'Profil tidak ditemukan.';
+            document.querySelector('.container').classList.add('loaded');
         }
     } catch (error) {
         console.error(error);
         displayNameEl.textContent = 'Gagal memuat profil.';
+        document.querySelector('.container').classList.add('loaded');
     }
 }
 
 document.addEventListener('DOMContentLoaded', loadProfile);
-
