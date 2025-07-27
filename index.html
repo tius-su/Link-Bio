@@ -4,19 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bio Link</title>
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <link rel="apple-touch-icon" href="./logo.png">
+
+    <link rel="stylesheet" href="./style.css">
+
 </head>
 <body>
+
     <div class="container">
         <div id="profile">
-            <img id="profile-pic" src="https://via.placeholder.com/96" alt="Profile Picture">
+            <img id="profile-pic" src="https://via.placeholder.com/96?text=Loading..." alt="Profile Picture">
             <h1 id="display-name">@username</h1>
         </div>
         <div id="links-container">
             </div>
     </div>
 
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="app.js"></script>
+
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./app.js"></script>
+
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+              console.log('✅ ServiceWorker registration successful');
+            })
+            .catch(err => {
+              console.log('❌ ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
+
 </body>
 </html>
