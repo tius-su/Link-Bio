@@ -1,7 +1,7 @@
 {
   "name": "Bio Link Kustom",
   "short_name": "Bio Link",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fafafa",
   "theme_color": "#007bff",
