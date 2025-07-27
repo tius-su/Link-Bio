@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" defer></script>
 </head>
 <body>
     <div class="admin-container">
@@ -18,23 +19,24 @@
             <input type="text" id="admin-display-name" placeholder="Nama Tampilan (e.g., @username)">
             <input type="url" id="admin-profile-pic-url" placeholder="URL Foto Profil">
             
-            <h4>Kustomisasi Warna</h4>
+            <h4>Kustomisasi Warna & Latar</h4>
             <div class="color-picker">
-                <label for="bg-color">Background:</label>
-                <input type="color" id="bg-color" value="#ffffff">
+                <label for="bg-color">Background Color:</label>
+                <input type="color" id="bg-color" value="#fafafa">
             </div>
             <div class="color-picker">
                 <label for="link-bg-color">Link Background:</label>
-                <input type="color" id="link-bg-color" value="#f1f1f1">
+                <input type="color" id="link-bg-color" value="#ffffff">
             </div>
              <div class="color-picker">
                 <label for="text-color">Text Color:</label>
-                <input type="color" id="text-color" value="#000000">
+                <input type="color" id="text-color" value="#1c1c1c">
             </div>
+            <input type="url" id="bg-image-url" placeholder="URL Gambar Latar Belakang (Opsional)">
         </section>
 
         <section class="admin-section">
-            <h3>Manajemen Link</h3>
+            <h3>Manajemen Link (Drag untuk Mengurutkan)</h3>
             <div id="admin-links-list">
                 </div>
             <button id="add-new-link-btn">+ Tambah Link Baru</button>
@@ -44,7 +46,7 @@
         <p>Link publik Anda: <a id="public-link" href="" target="_blank"></a></p>
     </div>
 
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="admin.js"></script>
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./admin.js"></script>
 </body>
 </html>
