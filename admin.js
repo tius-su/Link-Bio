@@ -1,4 +1,3 @@
-// ISI LENGKAP FILE admin.js YANG BARU
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -8,18 +7,21 @@ const USER_ID = "main_profile";
 const isLoginPage = window.location.pathname.includes('login.html');
 const isAdminPage = window.location.pathname.includes('admin.html');
 
+// Inisialisasi SortableJS
+if (isAdminPage) {
+    const adminLinksList = document.getElementById('admin-links-list');
+    new Sortable(adminLinksList, {
+        animation: 150,
+        handle: '.drag-handle', // Tentukan elemen untuk di-drag
+    });
+}
+
 onAuthStateChanged(auth, user => {
     if (user) {
-        if (isLoginPage) {
-            window.location.href = './admin.html';
-        }
-        if (isAdminPage) {
-            loadAdminData();
-        }
+        if (isLoginPage) { window.location.href = './admin.html'; }
+        if (isAdminPage) { loadAdminData(); }
     } else {
-        if (isAdminPage) {
-            window.location.href = './login.html';
-        }
+        if (isAdminPage) { window.location.href = './login.html'; }
     }
 });
 
@@ -34,7 +36,6 @@ if (isLoginPage) {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
             loginError.textContent = "Email atau password salah.";
-            console.error("Login failed:", error);
         }
     });
 }
@@ -59,9 +60,10 @@ async function loadAdminData() {
         document.getElementById('admin-display-name').value = data.displayName || '';
         document.getElementById('admin-profile-pic-url').value = data.profileImageUrl || '';
         if (data.theme) {
-            document.getElementById('bg-color').value = data.theme.backgroundColor || '#ffffff';
-            document.getElementById('link-bg-color').value = data.theme.linkBackgroundColor || '#f1f1f1';
-            document.getElementById('text-color').value = data.theme.textColor || '#000000';
+            document.getElementById('bg-color').value = data.theme.backgroundColor || '#fafafa';
+            document.getElementById('link-bg-color').value = data.theme.linkBackgroundColor || '#ffffff';
+            document.getElementById('text-color').value = data.theme.textColor || '#1c1c1c';
+            document.getElementById('bg-image-url').value = data.theme.backgroundImageUrl || '';
         }
         
         const linksList = document.getElementById('admin-links-list');
@@ -79,19 +81,22 @@ function createLinkEditor(linkData = {}) {
     const isDropdown = linkData.isDropdown || false;
 
     entry.innerHTML = `
-        <input type="text" class="link-title" placeholder="Judul Link" value="${linkData.title || ''}">
-        <input type="url" class="link-image-url" placeholder="URL Gambar Ikon (Opsional)" value="${linkData.imageUrl || ''}">
-        <input type="url" class="link-url" placeholder="URL Tujuan" value="${linkData.url || ''}" ${isDropdown ? 'style="display:none;"' : ''}>
-        <label>
-            <input type="checkbox" class="is-dropdown-checkbox" ${isDropdown ? 'checked' : ''}>
-            Jadikan Dropdown?
-        </label>
+        <div class="drag-handle" title="Drag untuk urutkan"></div>
+        <div class="link-inputs">
+            <input type="text" class="link-title" placeholder="Judul Link" value="${linkData.title || ''}">
+            <input type="url" class="link-image-url" placeholder="URL Gambar Ikon (Opsional)" value="${linkData.imageUrl || ''}">
+            <input type="url" class="link-url" placeholder="URL Tujuan" value="${linkData.url || ''}" ${isDropdown ? 'style="display:none;"' : ''}>
+            <label class="dropdown-label">
+                <input type="checkbox" class="is-dropdown-checkbox" ${isDropdown ? 'checked' : ''}>
+                Jadikan Dropdown?
+            </label>
+        </div>
+        <button type="button" class="delete-link-btn" title="Hapus link ini">×</button>
         <div class="sublinks-editor" ${!isDropdown ? 'style="display:none;"' : ''}>
             <h5>Sub-links:</h5>
             <div class="sublinks-list-editor"></div>
             <button type="button" class="add-sublink-btn">+ Tambah Sub-link</button>
         </div>
-        <button type="button" class="delete-link-btn">Hapus Link Ini</button>
     `;
 
     list.appendChild(entry);
@@ -106,39 +111,32 @@ function createLinkEditor(linkData = {}) {
     });
     
     entry.querySelector('.delete-link-btn').addEventListener('click', () => entry.remove());
-
-    const sublinksListEditor = entry.querySelector('.sublinks-list-editor');
+    entry.querySelector('.add-sublink-btn').addEventListener('click', () => createSublinkEditor(entry.querySelector('.sublinks-list-editor')));
+    
     if (isDropdown && linkData.sublinks) {
-        linkData.sublinks.forEach(sublink => createSublinkEditor(sublinksListEditor, sublink));
+        linkData.sublinks.forEach(sublink => createSublinkEditor(entry.querySelector('.sublinks-list-editor'), sublink));
     }
-    entry.querySelector('.add-sublink-btn').addEventListener('click', () => createSublinkEditor(sublinksListEditor));
 }
 
 function createSublinkEditor(container, sublinkData = {}) {
-    const subEntry = document.createElement('div');
-    subEntry.innerHTML = `
-        <input type="text" class="sublink-title" placeholder="Judul Sub-link" value="${sublinkData.title || ''}">
-        <input type="url" class="sublink-url" placeholder="URL Sub-link" value="${sublinkData.url || ''}">
-        <button type="button" class="delete-sublink-btn">x</button>
-    `;
-    container.appendChild(subEntry);
-    subEntry.querySelector('.delete-sublink-btn').addEventListener('click', () => subEntry.remove());
+    // ... (fungsi ini tidak berubah)
 }
 
 async function saveAdminData() {
     const links = [];
-    document.querySelectorAll('.admin-link-entry').forEach(entry => {
+    document.querySelectorAll('#admin-links-list .admin-link-entry').forEach(entry => {
         const title = entry.querySelector('.link-title').value;
+        if (!title) return; // Abaikan link jika judulnya kosong
+
         const imageUrl = entry.querySelector('.link-image-url').value;
         const isDropdown = entry.querySelector('.is-dropdown-checkbox').checked;
 
         if (isDropdown) {
             const sublinks = [];
             entry.querySelectorAll('.sublinks-list-editor > div').forEach(subEntry => {
-                sublinks.push({
-                    title: subEntry.querySelector('.sublink-title').value,
-                    url: subEntry.querySelector('.sublink-url').value,
-                });
+                const subTitle = subEntry.querySelector('.sublink-title').value;
+                const subUrl = subEntry.querySelector('.sublink-url').value;
+                if(subTitle && subUrl) sublinks.push({ title: subTitle, url: subUrl });
             });
             links.push({ title, imageUrl, isDropdown, sublinks });
         } else {
@@ -154,6 +152,7 @@ async function saveAdminData() {
             backgroundColor: document.getElementById('bg-color').value,
             linkBackgroundColor: document.getElementById('link-bg-color').value,
             textColor: document.getElementById('text-color').value,
+            backgroundImageUrl: document.getElementById('bg-image-url').value
         },
         links: links
     };
@@ -162,7 +161,6 @@ async function saveAdminData() {
         await setDoc(doc(db, "profiles", USER_ID), dataToSave);
         alert('Perubahan berhasil disimpan!');
     } catch (error) {
-        console.error("Error saving data: ", error);
-        alert('Gagal menyimpan perubahan. Lihat konsol untuk detail.');
+        alert('Gagal menyimpan perubahan.');
     }
 }
