@@ -181,4 +181,38 @@ header {
     margin-bottom: 0.5rem;
 }
 
+/* Tambahkan ini di paling bawah style.css */
+
+.link-item, .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 12px 15px;
+}
+
+.link-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    /* Menjaga gambar agar tidak mengecil */
+    flex-shrink: 0;
+}
+
+.link-item span, .dropdown-toggle span {
+    flex-grow: 1;
+    text-align: center;
+}
+
+/* Memberi margin agar teks tetap di tengah jika ada ikon */
+.link-item:has(.link-icon) span, .dropdown-toggle:has(.link-icon) span {
+    margin-left: -59px; /* -(lebar ikon + gap) */
+    padding-left: 59px;
+}
+
+/* Jika tidak ada ikon, pastikan teks benar-benar di tengah */
+.link-item:not(:has(.link-icon)), .dropdown-toggle:not(:has(.link-icon)) {
+    justify-content: center;
+}
 
