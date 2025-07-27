@@ -15,11 +15,9 @@ async function loadProfile() {
         if (docSnap.exists()) {
             const data = docSnap.data();
             
-            // Kode untuk menampilkan gambar profil dan nama
             profilePicEl.src = data.profileImageUrl || 'https://via.placeholder.com/96';
             displayNameEl.textContent = data.displayName || '@username';
 
-            // Kode untuk menerapkan tema (warna dan gambar latar)
             if (data.theme) {
                 document.documentElement.style.setProperty('--bg-color', data.theme.backgroundColor);
                 document.documentElement.style.setProperty('--link-bg-color', data.theme.linkBackgroundColor);
@@ -31,32 +29,85 @@ async function loadProfile() {
                 }
             }
 
-            // Kode untuk membuat semua tombol link
             linksContainer.innerHTML = '';
             if (data.links) {
                 const validLinks = data.links.filter(link => link && link.title);
+                
                 validLinks.forEach(link => {
-                    // (Logika untuk membuat link dropdown dan link biasa ada di sini)
-                    // ...
+                    if (link.isDropdown) {
+                        const dropdownContainer = document.createElement('div');
+                        dropdownContainer.className = 'dropdown-container';
+
+                        const toggle = document.createElement('a');
+                        toggle.href = '#';
+                        toggle.className = 'dropdown-toggle';
+
+                        if(link.imageUrl) {
+                            const icon = document.createElement('img');
+                            icon.src = link.imageUrl;
+                            icon.alt = link.title;
+                            icon.className = 'link-icon';
+                            toggle.appendChild(icon);
+                        }
+
+                        const titleSpan = document.createElement('span');
+                        titleSpan.textContent = link.title;
+                        toggle.appendChild(titleSpan);
+                        
+                        const list = document.createElement('ul');
+                        list.className = 'sublinks-list';
+
+                        toggle.onclick = (e) => {
+                            e.preventDefault();
+                            toggle.classList.toggle('open');
+                            list.classList.toggle('open');
+                        };
+
+                        if (link.sublinks && link.sublinks.length > 0) {
+                            link.sublinks.forEach(sublink => {
+                                const listItem = document.createElement('li');
+                                const sublinkAnchor = document.createElement('a');
+                                sublinkAnchor.href = sublink.url;
+                                sublinkAnchor.textContent = sublink.title;
+                                sublinkAnchor.className = 'sublink-item';
+                                sublinkAnchor.target = '_blank';
+                                listItem.appendChild(sublinkAnchor);
+                                list.appendChild(listItem);
+                            });
+                        }
+                        dropdownContainer.appendChild(toggle);
+                        dropdownContainer.appendChild(list);
+                        linksContainer.appendChild(dropdownContainer);
+                    } else {
+                        if(!link.url) return;
+                        const linkEl = document.createElement('a');
+                        linkEl.href = link.url;
+                        linkEl.className = 'link-item';
+                        linkEl.target = '_blank';
+
+                        if (link.imageUrl) {
+                            const icon = document.createElement('img');
+                            icon.src = link.imageUrl;
+                            icon.alt = link.title;
+                            icon.className = 'link-icon';
+                            linkEl.appendChild(icon);
+                        }
+                        
+                        const titleSpan = document.createElement('span');
+                        titleSpan.textContent = link.title;
+                        linkEl.appendChild(titleSpan);
+                        linksContainer.appendChild(linkEl);
+                    }
                 });
             }
-            
-            // <-- POSISI YANG TEPAT ADA DI SINI
-            // Tampilkan container setelah semua elemen di atas selesai dibuat
-            document.querySelector('.container').classList.add('loaded');
-
         } else {
             displayNameEl.textContent = 'Profil tidak ditemukan.';
-            // Tampilkan juga container jika profil tidak ditemukan agar pesan error terlihat
-            document.querySelector('.container').classList.add('loaded');
         }
     } catch (error) {
         console.error(error);
         displayNameEl.textContent = 'Gagal memuat profil.';
-        // Tampilkan juga container jika ada error agar pesan error terlihat
-        document.querySelector('.container').classList.add('loaded');
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', loadProfile);
+
