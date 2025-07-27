@@ -1,7 +1,6 @@
+// ISI LENGKAP FILE app.js YANG BARU
 import { db } from './firebase-config.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-console.log("✅ app.js loaded successfully.");
 
 const USER_ID = "main_profile";
 
@@ -10,70 +9,95 @@ const displayNameEl = document.getElementById('display-name');
 const linksContainer = document.getElementById('links-container');
 
 async function loadProfile() {
-    console.log("⏳ Attempting to load profile for USER_ID:", USER_ID);
     try {
         const docRef = doc(db, "profiles", USER_ID);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            console.log("✔️ Document found!", docSnap.data());
             const data = docSnap.data();
-
+            
             profilePicEl.src = data.profileImageUrl || 'https://via.placeholder.com/96';
             displayNameEl.textContent = data.displayName || '@username';
 
-            document.documentElement.style.setProperty('--bg-color', data.theme.backgroundColor);
-            document.documentElement.style.setProperty('--link-bg-color', data.theme.linkBackgroundColor);
-            document.documentElement.style.setProperty('--text-color', data.theme.textColor);
+            if (data.theme) {
+                document.documentElement.style.setProperty('--bg-color', data.theme.backgroundColor);
+                document.documentElement.style.setProperty('--link-bg-color', data.theme.linkBackgroundColor);
+                document.documentElement.style.setProperty('--text-color', data.theme.textColor);
+            }
 
             linksContainer.innerHTML = '';
-            data.links.forEach(link => {
-                if (link.isDropdown) {
-                    const dropdownContainer = document.createElement('div');
-                    dropdownContainer.className = 'dropdown-container';
+            if (data.links) {
+                data.links.forEach(link => {
+                    if (link.isDropdown) {
+                        const dropdownContainer = document.createElement('div');
+                        dropdownContainer.className = 'dropdown-container';
 
-                    const toggle = document.createElement('a');
-                    toggle.href = '#';
-                    toggle.className = 'dropdown-toggle';
-                    toggle.textContent = link.title;
-                    toggle.onclick = (e) => {
-                        e.preventDefault();
-                        list.classList.toggle('open');
-                    };
+                        const toggle = document.createElement('a');
+                        toggle.href = '#';
+                        toggle.className = 'dropdown-toggle';
 
-                    const list = document.createElement('ul');
-                    list.className = 'sublinks-list';
+                        if(link.imageUrl) {
+                            const icon = document.createElement('img');
+                            icon.src = link.imageUrl;
+                            icon.alt = link.title;
+                            icon.className = 'link-icon';
+                            toggle.appendChild(icon);
+                        }
 
-                    link.sublinks.forEach(sublink => {
-                        const listItem = document.createElement('li');
-                        const sublinkAnchor = document.createElement('a');
-                        sublinkAnchor.href = sublink.url;
-                        sublinkAnchor.textContent = sublink.title;
-                        sublinkAnchor.className = 'sublink-item';
-                        sublinkAnchor.target = '_blank';
-                        listItem.appendChild(sublinkAnchor);
-                        list.appendChild(listItem);
-                    });
+                        const titleSpan = document.createElement('span');
+                        titleSpan.textContent = link.title;
+                        toggle.appendChild(titleSpan);
 
-                    dropdownContainer.appendChild(toggle);
-                    dropdownContainer.appendChild(list);
-                    linksContainer.appendChild(dropdownContainer);
+                        toggle.onclick = (e) => {
+                            e.preventDefault();
+                            list.classList.toggle('open');
+                        };
 
-                } else {
-                    const linkEl = document.createElement('a');
-                    linkEl.href = link.url;
-                    linkEl.textContent = link.title;
-                    linkEl.className = 'link-item';
-                    linkEl.target = '_blank';
-                    linksContainer.appendChild(linkEl);
-                }
-            });
+                        const list = document.createElement('ul');
+                        list.className = 'sublinks-list';
 
+                        if (link.sublinks) {
+                            link.sublinks.forEach(sublink => {
+                                const listItem = document.createElement('li');
+                                const sublinkAnchor = document.createElement('a');
+                                sublinkAnchor.href = sublink.url;
+                                sublinkAnchor.textContent = sublink.title;
+                                sublinkAnchor.className = 'sublink-item';
+                                sublinkAnchor.target = '_blank';
+                                listItem.appendChild(sublinkAnchor);
+                                list.appendChild(listItem);
+                            });
+                        }
+                        dropdownContainer.appendChild(toggle);
+                        dropdownContainer.appendChild(list);
+                        linksContainer.appendChild(dropdownContainer);
+                    } else {
+                        const linkEl = document.createElement('a');
+                        linkEl.href = link.url;
+                        linkEl.className = 'link-item';
+                        linkEl.target = '_blank';
+
+                        if (link.imageUrl) {
+                            const icon = document.createElement('img');
+                            icon.src = link.imageUrl;
+                            icon.alt = link.title;
+                            icon.className = 'link-icon';
+                            linkEl.appendChild(icon);
+                        }
+                        
+                        const titleSpan = document.createElement('span');
+                        titleSpan.textContent = link.title;
+                        linkEl.appendChild(titleSpan);
+
+                        linksContainer.appendChild(linkEl);
+                    }
+                });
+            }
         } else {
-            console.log("❌ Document not found! Check if USER_ID and collection name are correct.");
+            displayNameEl.textContent = 'Profil tidak ditemukan.';
         }
     } catch (error) {
-        console.error("🔥 Error caught while loading profile: ", error);
+        console.error("Error loading profile: ", error);
         displayNameEl.textContent = 'Gagal memuat profil.';
     }
 }
